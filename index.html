@@ -20,6 +20,7 @@
     }
 
     #username-input,
+    #room-input,
     #m {
       width: calc(100% - 16px);
       padding: 8px;
@@ -30,7 +31,8 @@
     }
 
     #form button,
-    #username-form button {
+    #username-form button,
+    #room-form button {
       width: calc(100% - 16px);
       padding: 8px;
       margin: 8px;
@@ -41,7 +43,8 @@
     }
 
     #form button:hover,
-    #username-form button:hover {
+    #username-form button:hover,
+    #room-form button:hover {
       background-color: #677bc4;
     }
 
@@ -63,7 +66,9 @@
 
     #server-name,
     #username-screen h2,
-    #username-screen p {
+    #username-screen p,
+    #room-screen h2,
+    #room-screen p {
       text-align: center;
     }
 
@@ -80,6 +85,14 @@
       <form id="username-form" action="">
         <input id="username-input" autocomplete="off" placeholder="Your username" required />
         <button type="submit">Join Chat</button>
+      </form>
+    </div>
+
+    <div id="room-screen" style="display: none;">
+      <h2>Enter room name</h2>
+      <form id="room-form" action="">
+        <input id="room-input" autocomplete="off" placeholder="Room name" required />
+        <button type="submit">Join Room</button>
       </form>
     </div>
 
@@ -103,25 +116,44 @@
     const messages = $('#messages');
     const usernameScreen = $('#username-screen');
     const usernameForm = $('#username-form');
+    const roomScreen = $('#room-screen');
+    const roomForm = $('#room-form');
     const usernameInput = $('#username-input');
+    const roomInput = $('#room-input');
     const chat = $('#chat');
     const serverName = $('#server-name');
+    let currentRoom;
+
+    // Function to show the username screen
+    function showUsernameScreen() {
+      usernameScreen.show();
+      roomScreen.hide();
+      chat.hide();
+    }
+
+    // Function to show the room screen
+    function showRoomScreen() {
+      usernameScreen.hide();
+      roomScreen.show();
+      chat.hide();
+    }
 
     // Function to show the chat screen and handle messages
-    function showChatScreen(username) {
-      // Hide username screen, show chat
+    function showChatScreen(username, room) {
+      // Hide username and room screens, show chat
       usernameScreen.hide();
+      roomScreen.hide();
       chat.show();
 
       // Set server name
-      serverName.text(`Welcome to the Dark Chat Room, ${username}!`);
+      serverName.text(`Welcome to the Dark Chat Room - ${room}`);
 
       form.submit(function (e) {
         e.preventDefault();
         const message = input.val();
         if (message) {
           const timestamp = new Date().toLocaleTimeString();
-          const data = { username, message, timestamp };
+          const data = { username, message, timestamp, room };
           socket.emit('chat message', data);
           input.val('');
           displayMessage(data);  // Display own message immediately
@@ -140,11 +172,11 @@
         messages.append($('<li>').text(`${newUser} joined the chat`));
       });
 
-     socket.on('chat message', function (data) {
-  console.log('Received message:', data);
-  displayMessage(data);
-});
-
+      socket.on('chat message', function (data) {
+        if (data.room === room) {
+          displayMessage(data);
+        }
+      });
     }
 
     // Function to display a message in the chat
@@ -161,13 +193,24 @@
       e.preventDefault();
       const username = usernameInput.val();
       if (username) {
-        // Emit the username to the server
-        socket.emit('set username', username);
-
-        // Call the function to show the chat screen
-        showChatScreen(username);
+        showRoomScreen();
       }
     });
+
+    // Submit the room form
+    roomForm.submit(function (e) {
+      e.preventDefault();
+      const username = usernameInput.val();
+      const room = roomInput.val();
+      if (username && room) {
+        currentRoom = room;
+        socket.emit('join room', { username, room });
+        showChatScreen(username, room);
+      }
+    });
+
+    // Initially show the username screen
+    showUsernameScreen();
   </script>
 </body>
 </html>
