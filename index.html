@@ -60,7 +60,8 @@
       margin-bottom: 8px;
     }
 
-    #chat {
+    #chat,
+    #available-rooms {
       display: none;
     }
 
@@ -78,8 +79,23 @@
     #server-name {
       margin-top: 16px;
     }
+
+    .room-button {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      background-color: #7289da;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .room-button:hover {
+      background-color: #677bc4;
+    }
   </style>
-  <title>Nisa</title>
+  <title>Dark Chat Room</title>
 </head>
 <body>
   <div id="app">
@@ -92,7 +108,8 @@
     </div>
 
     <div id="room-screen" style="display: none;">
-      <h2>Enter room name</h2>
+      <h2>Choose or create a room</h2>
+      <div id="available-rooms"></div>
       <form id="room-form" action="">
         <input id="room-input" autocomplete="off" placeholder="Room name" required />
         <button type="submit">Join</button>
@@ -115,7 +132,7 @@
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
-    const socket = io('https://main--nisaz.netlify.app/');
+    const socket = io('https://celebrated-moxie-f05583.netlify.app/');
     const form = $('#form');
     const input = $('#m');
     const messages = $('#messages');
@@ -123,6 +140,7 @@
     const usernameForm = $('#username-form');
     const roomScreen = $('#room-screen');
     const roomForm = $('#room-form');
+    const availableRooms = $('#available-rooms');
     const errorMessage = $('#error-message');
     const usernameInput = $('#username-input');
     const roomInput = $('#room-input');
@@ -144,6 +162,7 @@
       roomScreen.show();
       chat.hide();
       errorMessage.hide();
+      availableRooms.empty();
     }
 
     // Function to show the chat screen and handle messages
@@ -154,7 +173,7 @@
       chat.show();
 
       // Set server name
-      serverName.text(`Welcome to NISA Room - ${room}`);
+      serverName.text(`Welcome to the Dark Chat Room - ${room}`);
 
       form.submit(function (e) {
         e.preventDefault();
@@ -210,12 +229,33 @@
       }
     }
 
+    // Function to show available rooms
+    function showAvailableRooms(rooms) {
+      availableRooms.empty();
+      rooms.forEach(function (room) {
+        const button = $('<button>').text(room).addClass('room-button');
+        button.on('click', function () {
+          joinExistingRoom(room);
+        });
+        availableRooms.append(button);
+      });
+    }
+
+    // Function to join an existing room
+    function joinExistingRoom(room) {
+      const username = usernameInput.val();
+      currentRoom = room;
+      socket.emit('join room', { username, room });
+      showChatScreen(username, room);
+    }
+
     // Submit the username form
     usernameForm.submit(function (e) {
       e.preventDefault();
       const username = usernameInput.val();
       if (username) {
-        showRoomScreen();
+        // Request available rooms from the server
+        socket.emit('get available rooms');
       }
     });
 
@@ -232,6 +272,11 @@
         errorMessage.text('Enter valid room name');
         errorMessage.show();
       }
+    });
+
+    // Listen for available rooms from the server
+    socket.on('available rooms', function (rooms) {
+      showAvailableRooms(rooms);
     });
 
     // Initially show the username screen
