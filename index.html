@@ -68,8 +68,11 @@
     #username-screen h2,
     #username-screen p,
     #room-screen h2,
-    #room-screen p {
+    #room-screen p,
+    #error-message {
       text-align: center;
+      color: red;
+      margin-top: 10px;
     }
 
     #server-name {
@@ -84,7 +87,7 @@
       <h2>Enter your username</h2>
       <form id="username-form" action="">
         <input id="username-input" autocomplete="off" placeholder="Your username" required />
-        <button type="submit">Join Chat</button>
+        <button type="submit">Next</button>
       </form>
     </div>
 
@@ -92,8 +95,10 @@
       <h2>Enter room name</h2>
       <form id="room-form" action="">
         <input id="room-input" autocomplete="off" placeholder="Room name" required />
-        <button type="submit">Join Room</button>
+        <button type="submit">Join</button>
+        <button type="button" onclick="showCreateRoom()">Create</button>
       </form>
+      <p id="error-message"></p>
     </div>
 
     <div id="chat">
@@ -118,6 +123,7 @@
     const usernameForm = $('#username-form');
     const roomScreen = $('#room-screen');
     const roomForm = $('#room-form');
+    const errorMessage = $('#error-message');
     const usernameInput = $('#username-input');
     const roomInput = $('#room-input');
     const chat = $('#chat');
@@ -129,6 +135,7 @@
       usernameScreen.show();
       roomScreen.hide();
       chat.hide();
+      errorMessage.hide();
     }
 
     // Function to show the room screen
@@ -136,6 +143,7 @@
       usernameScreen.hide();
       roomScreen.show();
       chat.hide();
+      errorMessage.hide();
     }
 
     // Function to show the chat screen and handle messages
@@ -188,6 +196,20 @@
       messages.scrollTop(messages.prop('scrollHeight'));
     }
 
+    // Function to show create room screen
+    function showCreateRoom() {
+      const username = usernameInput.val();
+      const room = roomInput.val();
+      if (username && room) {
+        currentRoom = room;
+        socket.emit('join room', { username, room });
+        showChatScreen(username, room);
+      } else {
+        errorMessage.text('Enter valid room name');
+        errorMessage.show();
+      }
+    }
+
     // Submit the username form
     usernameForm.submit(function (e) {
       e.preventDefault();
@@ -206,6 +228,9 @@
         currentRoom = room;
         socket.emit('join room', { username, room });
         showChatScreen(username, room);
+      } else {
+        errorMessage.text('Enter valid room name');
+        errorMessage.show();
       }
     });
 
