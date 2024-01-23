@@ -20,6 +20,7 @@
     }
 
     #username-input,
+    #room-input,
     #m {
       width: calc(100% - 16px);
       padding: 8px;
@@ -30,7 +31,8 @@
     }
 
     #form button,
-    #username-form button {
+    #username-form button,
+    #room-form button {
       width: calc(100% - 16px);
       padding: 8px;
       margin: 8px;
@@ -41,7 +43,8 @@
     }
 
     #form button:hover,
-    #username-form button:hover {
+    #username-form button:hover,
+    #room-form button:hover {
       background-color: #677bc4;
     }
 
@@ -57,7 +60,8 @@
       margin-bottom: 8px;
     }
 
-    #chat {
+    #chat,
+    #available-rooms {
       display: none;
     }
 
@@ -71,6 +75,21 @@
     #server-name {
       margin-top: 16px;
     }
+
+    .room-button {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      background-color: #7289da;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .room-button:hover {
+      background-color: #677bc4;
+    }
   </style>
   <title>Dark Chat Room</title>
 </head>
@@ -80,7 +99,17 @@
       <h2>Enter your username</h2>
       <form id="username-form" action="">
         <input id="username-input" autocomplete="off" placeholder="Your username" required />
-        <button type="submit">Join Chat</button>
+        <button type="submit">Next</button>
+      </form>
+    </div>
+
+    <div id="room-screen" style="display: none;">
+      <h2>Choose or create a room</h2>
+      <div id="available-rooms"></div>
+      <form id="room-form" action="">
+        <input id="room-input" autocomplete="off" placeholder="Room name" required />
+        <button type="submit">Join</button>
+        <button type="button" onclick="showCreateRoom()">Create</button>
       </form>
       <p id="error-message"></p>
     </div>
@@ -99,38 +128,55 @@
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
-    const socket = io('https://celebrated-moxie-f05583.netlify.app/');
+    const socket = io('https://main--nisaz.netlify.app/');
     const form = $('#form');
     const input = $('#m');
     const messages = $('#messages');
     const usernameScreen = $('#username-screen');
     const usernameForm = $('#username-form');
+    const roomScreen = $('#room-screen');
+    const roomForm = $('#room-form');
+    const availableRooms = $('#available-rooms');
+    const errorMessage = $('#error-message');
+    const usernameInput = $('#username-input');
+    const roomInput = $('#room-input');
     const chat = $('#chat');
     const serverName = $('#server-name');
-    const errorMessage = $('#error-message');
+    let currentRoom;
 
     // Function to show the username screen
     function showUsernameScreen() {
       usernameScreen.show();
+      roomScreen.hide();
       chat.hide();
       errorMessage.hide();
     }
 
-    // Function to show the chat screen and handle messages
-    function showChatScreen(username) {
-      // Hide username screen, show chat
+    // Function to show the room screen
+    function showRoomScreen() {
       usernameScreen.hide();
+      roomScreen.show();
+      chat.hide();
+      errorMessage.hide();
+      availableRooms.empty();
+    }
+
+    // Function to show the chat screen and handle messages
+    function showChatScreen(username, room) {
+      // Hide username and room screens, show chat
+      usernameScreen.hide();
+      roomScreen.hide();
       chat.show();
 
       // Set server name
-      serverName.text(`Welcome to the Dark Chat Room, ${username}!`);
+      serverName.text(`Welcome to the Dark Chat Room - ${room}`);
 
       form.submit(function (e) {
         e.preventDefault();
         const message = input.val();
         if (message) {
           const timestamp = new Date().toLocaleTimeString();
-          const data = { username, message, timestamp };
+          const data = { username, message, timestamp, room };
           socket.emit('chat message', data);
           input.val('');
           displayMessage(data);  // Display own message immediately
@@ -150,7 +196,9 @@
       });
 
       socket.on('chat message', function (data) {
-        displayMessage(data);
+        if (data.room === room) {
+          displayMessage(data);
+        }
       });
     }
 
@@ -163,21 +211,74 @@
       messages.scrollTop(messages.prop('scrollHeight'));
     }
 
+    // Function to show create room screen
+    function showCreateRoom() {
+      const username = usernameInput.val();
+      const room = roomInput.val();
+      if (username && room) {
+        currentRoom = room;
+        socket.emit('join room', { username, room });
+        showChatScreen(username, room);
+      } else {
+        errorMessage.text('Enter valid room name');
+        errorMessage.show();
+      }
+    }
+
     // Submit the username form
     usernameForm.submit(function (e) {
       e.preventDefault();
-      const username = $('#username-input').val();
+      const username = usernameInput.val();
       if (username) {
-        // Emit the username to the server
-        socket.emit('set username', username);
+        // Request available rooms from the server
+        socket.emit('get available rooms');
+      }
+    });
 
-        // Call the function to show the chat screen
-        showChatScreen(username);
+    // Submit the room form
+    roomForm.submit(function (e) {
+      e.preventDefault();
+      const username = usernameInput.val();
+      const room = roomInput.val();
+      if (username && room) {
+        currentRoom = room;
+        socket.emit('join room', { username, room });
+        showChatScreen(username, room);
       } else {
-        errorMessage.text('Enter a valid username');
+        errorMessage.text('Enter valid room name');
         errorMessage.show();
       }
     });
+
+    // Listen for available rooms from the server
+    socket.on('available rooms', function (rooms) {
+      showAvailableRooms(rooms);
+    });
+
+    // Initially show the username screen
+    showUsernameScreen();
+
+    // Function to show available rooms
+    function showAvailableRooms(rooms) {
+      availableRooms.empty();
+      rooms.forEach(function (room) {
+        const button = $('<button>')
+          .text(room)
+          .addClass('room-button')
+          .on('click', function () {
+            joinExistingRoom(room);
+          });
+        availableRooms.append(button);
+      });
+    }
+
+    // Function to join an existing room
+    function joinExistingRoom(room) {
+      const username = usernameInput.val();
+      currentRoom = room;
+      socket.emit('join room', { username, room });
+      showChatScreen(username, room);
+    }
   </script>
 </body>
 </html>
