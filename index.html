@@ -52,7 +52,7 @@
       margin-bottom: 8px;
     }
   </style>
-  <title>Simple Chat Room</title>
+  <title>Simple Chat Room with MongoDB</title>
 </head>
 <body>
   <div id="app">
@@ -70,7 +70,9 @@
   <!-- Include Socket.IO and jQuery -->
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
   <script>
+    // Client-side code
     const socket = io('https://main--nisaz.netlify.app/');
     const usernameInput = $('#username-input');
     const chat = $('#chat');
@@ -102,6 +104,60 @@
         input.val('');
       }
     }
+  </script>
+
+  <script>
+    // Server-side code (using Node.js syntax within <script> tags)
+    const express = require('express');
+    const http = require('http');
+    const socketIo = require('socket.io');
+    const { MongoClient } = require('mongodb');
+
+    const app = express();
+    const server = http.createServer(app);
+    const io = socketIo(server);
+
+    app.use(express.static('public'));
+
+    const PORT = process.env.PORT || 3000;
+
+    const connectionString = 'mongodb+srv://cluster0.khhguyg.mongodb.net/" --apiVersion 1 --username bezzerrrr';
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      auth: {
+        user: 'bezzerrrr',
+        password: 'Xsxrvfrc123'
+      }
+    };
+
+    MongoClient.connect(connectionString, options, (err, client) => {
+      if (err) {
+        console.error('Error connecting to MongoDB:', err);
+        return;
+      }
+
+      const db = client.db('your_database_name');
+      const messagesCollection = db.collection('messages');
+
+      io.on('connection', (socket) => {
+        console.log('A user connected');
+
+        socket.on('join', (username) => {
+          // Handle user join logic
+        });
+
+        socket.on('chat message', (data) => {
+          // Handle chat message logic
+        });
+
+        // Add other socket event handlers as needed
+      });
+
+      server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    });
   </script>
 </body>
 </html>
