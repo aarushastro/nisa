@@ -96,6 +96,9 @@
   <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+  
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
     const socket = io();
     const form = $('#form');
@@ -106,16 +109,16 @@
     const usernameInput = $('#username-input');
     const chat = $('#chat');
     const serverName = $('#server-name');
-
+  
     // Function to show the chat screen and handle messages
     function showChatScreen(username) {
       // Hide username screen, show chat
       usernameScreen.hide();
       chat.show();
-
+  
       // Set server name
       serverName.text(`Welcome to the Dark Chat Room, ${username}!`);
-
+  
       form.submit(function () {
         const message = input.val();
         if (message) {
@@ -123,10 +126,11 @@
           const data = { username, message, timestamp };
           socket.emit('chat message', data);
           input.val('');
+          displayMessage(data);  // Display own message immediately
         }
         return false;
       });
-
+  
       // Display all previous messages
       socket.on('all messages', function (allMessages) {
         messages.empty();
@@ -134,25 +138,25 @@
           displayMessage(data);
         });
       });
-
+  
       socket.on('user connected', function (newUser) {
         messages.append($('<li>').text(`${newUser} joined the chat`));
       });
-
+  
       socket.on('chat message', function (data) {
         displayMessage(data);
       });
     }
-
+  
     // Function to display a message in the chat
     function displayMessage(data) {
       const messageText = `[${data.timestamp}] ${data.username}: ${data.message}`;
       messages.append($('<li>').text(messageText));
-
+  
       // Scroll to the bottom of the messages to see the latest
       messages.scrollTop(messages.prop("scrollHeight"));
     }
-
+  
     // Submit the username form
     usernameForm.submit(function (e) {
       e.preventDefault();
@@ -160,11 +164,12 @@
       if (username) {
         // Emit the username to the server
         socket.emit('set username', username);
-
+  
         // Call the function to show the chat screen
         showChatScreen(username);
       }
     });
   </script>
+  
 </body>
 </html>
