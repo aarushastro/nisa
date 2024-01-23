@@ -140,9 +140,11 @@
         messages.append($('<li>').text(`${newUser} joined the chat`));
       });
 
-      socket.on('chat message', function (data) {
-        displayMessage(data);
-      });
+     socket.on('chat message', function (data) {
+  console.log('Received message:', data);
+  displayMessage(data);
+});
+
     }
 
     // Function to display a message in the chat
