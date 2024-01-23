@@ -229,26 +229,6 @@
       }
     }
 
-    // Function to show available rooms
-    function showAvailableRooms(rooms) {
-      availableRooms.empty();
-      rooms.forEach(function (room) {
-        const button = $('<button>').text(room).addClass('room-button');
-        button.on('click', function () {
-          joinExistingRoom(room);
-        });
-        availableRooms.append(button);
-      });
-    }
-
-    // Function to join an existing room
-    function joinExistingRoom(room) {
-      const username = usernameInput.val();
-      currentRoom = room;
-      socket.emit('join room', { username, room });
-      showChatScreen(username, room);
-    }
-
     // Submit the username form
     usernameForm.submit(function (e) {
       e.preventDefault();
