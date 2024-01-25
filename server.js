@@ -28,8 +28,7 @@ io.on('connection', socket => {
   socket.on('sendMessage', message => {
     const user = users.find(u => u.id === socket.id);
     if (user) {
-      const timestamp = new Date().toLocaleTimeString();
-      io.emit('newMessage', { username: user.username, text: message.text, timestamp });
+      io.emit('newMessage', { username: user.username, text: message.text, timestamp: message.timestamp });
     }
   });
 
@@ -47,4 +46,3 @@ io.on('connection', socket => {
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
