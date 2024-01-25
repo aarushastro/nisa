@@ -1,162 +1,95 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Chat App</title>
   <style>
     body {
-      font-family: 'Helvetica', sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       display: flex;
+      height: 100vh;
+    }
+
+    #sidebar {
+      width: 200px;
       background-color: #36393f;
-      color: #fff;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
     }
 
-    #app {
+    #chat {
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: scroll;
+    }
+
+    #messageInput {
+      width: calc(100% - 40px);
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    #sendMessageBtn {
       width: 100%;
-      max-width: 800px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    input, button {
-      width: calc(100% - 16px);
-      padding: 8px;
-      margin: 8px;
-      background-color: #40444b;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #7289da;
+      color: white;
       border: none;
-      color: #fff;
-    }
-
-    button {
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #7289da;
-    }
-
-    #messages {
-      list-style-type: none;
-      padding: 0;
-      overflow-y: scroll;
-      max-height: 400px;
-      width: 100%;
-      margin: 8px;
-    }
-
-    #messages li {
-      margin-bottom: 8px;
-    }
   </style>
-  <title>Simple Chat Room with MongoDB</title>
 </head>
 <body>
-  <div id="app">
-    <input id="username-input" autocomplete="off" placeholder="Your username" required />
-    <button onclick="joinChat()">Join Chat</button>
-
-    <div id="chat" style="display: none;">
-      <h1 id="server-name"></h1>
-      <ul id="messages"></ul>
-      <input id="m" autocomplete="off" placeholder="Type here..." />
-      <button onclick="sendMessage()">Send</button>
-    </div>
+  <div id="sidebar">
+    <h2>Online Users</h2>
+    <ul id="userList"></ul>
+  </div>
+  <div id="chat">
+    <div id="messageContainer"></div>
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button id="sendMessageBtn">Send</button>
   </div>
 
-  <!-- Include Socket.IO and jQuery -->
-  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
+  <script src="/socket.io/socket.io.js"></script>
   <script>
-    // Client-side code
-    const socket = io('https://main--nisaz.netlify.app/');
-    const usernameInput = $('#username-input');
-    const chat = $('#chat');
-    const messages = $('#messages');
-    const input = $('#m');
+    const socket = io();
 
-    function joinChat() {
-      const username = usernameInput.val();
-      if (username) {
-        socket.emit('join', username);
-        chat.show();
-        $('#server-name').text(`Welcome to the Chat Room, ${username}!`);
-
-        socket.on('chat message', function (data) {
-          const messageText = `[${data.timestamp}] ${data.username}: ${data.message}`;
-          messages.append($('<li>').text(messageText));
-          messages.scrollTop(messages.prop('scrollHeight'));
-        });
-      }
-    }
-
-    function sendMessage() {
-      const message = input.val();
-      if (message) {
-        const username = usernameInput.val();
-        const timestamp = new Date().toLocaleTimeString();
-        const data = { username, message, timestamp };
-        socket.emit('chat message', data);
-        input.val('');
-      }
-    }
-  </script>
-
-  <script>
-    // Server-side code (using Node.js syntax within <script> tags)
-    const express = require('express');
-    const http = require('http');
-    const socketIo = require('socket.io');
-    const { MongoClient } = require('mongodb');
-
-    const app = express();
-    const server = http.createServer(app);
-    const io = socketIo(server);
-
-    app.use(express.static('public'));
-
-    const PORT = process.env.PORT || 3000;
-
-    const connectionString = 'mongodb+srv://cluster0.khhguyg.mongodb.net/" --apiVersion 1 --username bezzerrrr';
-    const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      auth: {
-        user: 'bezzerrrr',
-        password: 'Xsxrvfrc123'
-      }
-    };
-
-    MongoClient.connect(connectionString, options, (err, client) => {
-      if (err) {
-        console.error('Error connecting to MongoDB:', err);
-        return;
-      }
-
-      const db = client.db('your_database_name');
-      const messagesCollection = db.collection('messages');
-
-      io.on('connection', (socket) => {
-        console.log('A user connected');
-
-        socket.on('join', (username) => {
-          // Handle user join logic
-        });
-
-        socket.on('chat message', (data) => {
-          // Handle chat message logic
-        });
-
-        // Add other socket event handlers as needed
+    // Display online users in the sidebar
+    const userList = document.getElementById('userList');
+    socket.on('updateUsers', users => {
+      userList.innerHTML = '';
+      users.forEach(user => {
+        const listItem = document.createElement('li');
+        listItem.textContent = user.username;
+        userList.appendChild(listItem);
       });
+    });
 
-      server.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
+    // Display messages in the chat area
+    const messageContainer = document.getElementById('messageContainer');
+    socket.on('newMessage', message => {
+      const messageElement = document.createElement('div');
+      messageElement.textContent = `${message.username} (${message.timestamp}): ${message.text}`;
+      messageContainer.appendChild(messageElement);
+    });
+
+    // Send a message when the button is clicked
+    const sendMessageBtn = document.getElementById('sendMessageBtn');
+    const messageInput = document.getElementById('messageInput');
+    sendMessageBtn.addEventListener('click', () => {
+      const newMessage = messageInput.value;
+      if (newMessage.trim() !== '') {
+        socket.emit('sendMessage', { text: newMessage });
+        messageInput.value = '';
+      }
     });
   </script>
 </body>
