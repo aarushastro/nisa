@@ -1,5 +1,3 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,7 +85,8 @@
     sendMessageBtn.addEventListener('click', () => {
       const newMessage = messageInput.value;
       if (newMessage.trim() !== '') {
-        socket.emit('sendMessage', { text: newMessage });
+        const timestamp = new Date().toLocaleTimeString();
+        socket.emit('sendMessage', { text: newMessage, timestamp });
         messageInput.value = '';
       }
     });
