@@ -13,6 +13,19 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+// In server.js
+app.route('/messages')
+  .get((req, res) => {
+    console.log('GET /messages');
+    res.json({ messages });
+  })
+.post((req, res) => {
+    console.log('POST /messages', req.body);
+    const { username, message } = req.body;
+    messages.push({ username, message });
+    res.json({ status: 'Message sent successfully' });
+  });
+
 app.route('/messages')
   .get((req, res) => {
     res.json({ messages });
