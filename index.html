@@ -1,95 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Chat App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      height: 100vh;
-    }
-
-    #sidebar {
-      width: 200px;
-      background-color: #36393f;
-      color: white;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    #chat {
-      flex: 1;
-      padding: 20px;
-      box-sizing: border-box;
-      overflow-y: scroll;
-    }
-
-    #messageInput {
-      width: calc(100% - 40px);
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    #sendMessageBtn {
-      width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-      background-color: #7289da;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Chat</title>
+    <style>
+        body {
+            background-color: #333;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #chat-box {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        #message-input {
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div id="sidebar">
-    <h2>Online Users</h2>
-    <ul id="userList"></ul>
-  </div>
-  <div id="chat">
-    <div id="messageContainer"></div>
-    <input type="text" id="messageInput" placeholder="Type your message...">
-    <button id="sendMessageBtn">Send</button>
-  </div>
+    <div id="chat-box"></div>
+    <input type="text" id="username" placeholder="Your username">
+    <input type="text" id="message-input" placeholder="Type your message">
+    <button onclick="sendMessage()">Send</button>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
+    <script>
+        function sendMessage() {
+            const username = document.getElementById('username').value;
+            const message = document.getElementById('message-input').value;
 
-    // Display online users in the sidebar
-    const userList = document.getElementById('userList');
-    socket.on('updateUsers', users => {
-      userList.innerHTML = '';
-      users.forEach(user => {
-        const listItem = document.createElement('li');
-        listItem.textContent = user.username;
-        userList.appendChild(listItem);
-      });
-    });
+            if (username && message) {
+                fetch('http://127.0.0.1:5000/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        message: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    document.getElementById('message-input').value = '';
+                    getMessages();
+                });
+            } else {
+                alert('Please enter both username and message.');
+            }
+        }
 
-    // Display messages in the chat area
-    const messageContainer = document.getElementById('messageContainer');
-    socket.on('newMessage', message => {
-      const messageElement = document.createElement('div');
-      messageElement.textContent = `${message.username} (${message.timestamp}): ${message.text}`;
-      messageContainer.appendChild(messageElement);
-    });
+        function getMessages() {
+            fetch('http://127.0.0.1:5000/messages')
+            .then(response => response.json())
+            .then(data => {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML = '';
 
-    // Send a message when the button is clicked
-    const sendMessageBtn = document.getElementById('sendMessageBtn');
-    const messageInput = document.getElementById('messageInput');
-    sendMessageBtn.addEventListener('click', () => {
-      const newMessage = messageInput.value;
-      if (newMessage.trim() !== '') {
-        const timestamp = new Date().toLocaleTimeString();
-        socket.emit('sendMessage', { text: newMessage, timestamp });
-        messageInput.value = '';
-      }
-    });
-  </script>
+                data.messages.forEach(msg => {
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `${msg.username}: ${msg.message}`;
+                    chatBox.appendChild(messageElement);
+                });
+
+                // Scroll to the bottom
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+
+        // Fetch messages initially
+        getMessages();
+
+        // Fetch messages every 3 seconds (for demonstration purposes)
+        setInterval(getMessages, 3000);
+    </script>
 </body>
 </html>
