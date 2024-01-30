@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>NISAZ</title>
+    <title>Global Chat</title>
     <style>
         body {
             background-color: #333;
@@ -37,7 +37,7 @@
             const message = document.getElementById('message-input').value;
 
             if (username && message) {
-                fetch('http://127.0.0.1:5000/messages', {
+                fetch('http://localhost:3000/messages', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -59,7 +59,7 @@
         }
 
         function getMessages() {
-            fetch('http://127.0.0.1:5000/messages')
+            fetch('http://localhost:3000/messages')
             .then(response => response.json())
             .then(data => {
                 const chatBox = document.getElementById('chat-box');
@@ -71,15 +71,15 @@
                     chatBox.appendChild(messageElement);
                 });
 
-                
+                // Scroll to the bottom
                 chatBox.scrollTop = chatBox.scrollHeight;
             });
         }
 
-
+        // Fetch messages initially
         getMessages();
 
-
+        // Fetch messages every 3 seconds (for demonstration purposes)
         setInterval(getMessages, 3000);
     </script>
 </body>
