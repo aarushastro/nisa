@@ -1,58 +1,27 @@
-function checkPassword() {
-    const enteredUsername = document.getElementById('username').value;
-    const enteredPassword = document.getElementById('password').value;
+const express = require('express');
+const cors = require('cors');
 
-    if (enteredUsername.toLowerCase() === 'aruz' && enteredPassword === 'success') {
-        document.getElementById('login-message').innerHTML = 'Login successful!';
-        document.getElementById('login-message').style.color = 'green';
-    } else {
-        document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
-        document.getElementById('login-message').style.color = 'red';
-    }
-}
+const app = express();
+const port = 3000;
 
-function sendMessage() {
-    const username = document.getElementById('username').value;
-    const message = document.getElementById('message-input').value;
+app.use(cors());
+app.use(express.json());
 
-    if (username && message) {
-        fetch('http://localhost:3000/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                message: message
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            document.getElementById('message-input').value = '';
-            getMessages();
-        });
-    } else {
-        alert('Please enter both username and message.');
-    }
-}
+let messages = [];
 
-function getMessages() {
-    fetch('http://localhost:3000/messages')
-    .then(response => response.json())
-    .then(data => {
-        const chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML = '';
+app.route('/messages')
+  .get((req, res) => {
+    console.log('GET /messages');
+    res.json({ messages });
+  })
+  .post((req, res) => {
+    console.log('POST /messages', req.body);
+    const { username, message } = req.body;
+    const timestamp = new Date().toISOString(); // Get current time in ISO 8601 format
+    messages.push({ username, message, timestamp });
+    res.json({ status: 'Message sent successfully' });
+  });
 
-        data.messages.forEach(msg => {
-            const messageElement = document.createElement('div');
-            messageElement.textContent = `${msg.username}: ${msg.message}`;
-            chatBox.appendChild(messageElement);
-        });
-
-        chatBox.scrollTop = chatBox.scrollHeight;
-    });
-}
-
-getMessages();
-setInterval(getMessages, 3000);
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
