@@ -1,69 +1,58 @@
-body {
-    font-family: monospace;
-    letter-spacing: 0px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #1c1c1c;
+function checkPassword() {
+    const enteredUsername = document.getElementById('username').value;
+    const enteredPassword = document.getElementById('password').value;
+
+    if (enteredUsername.toLowerCase() === 'aruz' && enteredPassword === 'success') {
+        document.getElementById('login-message').innerHTML = 'Login successful!';
+        document.getElementById('login-message').style.color = 'green';
+    } else {
+        document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
+        document.getElementById('login-message').style.color = 'red';
+    }
 }
 
-#login-form {
-    color: white;
-    text-align: center;
-    background: rgb(0, 0, 0);
-    background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 35%, rgba(39, 39, 39, 1) 100%);
-    margin: inherit;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+function sendMessage() {
+    const username = document.getElementById('username').value;
+    const message = document.getElementById('message-input').value;
+
+    if (username && message) {
+        fetch('http://localhost:3000/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            document.getElementById('message-input').value = '';
+            getMessages();
+        });
+    } else {
+        alert('Please enter both username and message.');
+    }
 }
 
-#login-message {
-    margin: 20px;
+function getMessages() {
+    fetch('http://localhost:3000/messages')
+    .then(response => response.json())
+    .then(data => {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML = '';
+
+        data.messages.forEach(msg => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${msg.username}: ${msg.message}`;
+            chatBox.appendChild(messageElement);
+        });
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
 }
 
-input {
-    padding: 12px;
-    margin: 8px 0;
-    color: #333;
-    width: 100%;
-    background-color: #444;
-    border: none;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-#login_btn {
-    background-color: #ffcc80;
-    width: 100%;
-    height: 40px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    color: white;
-    box-shadow: 0 0 5px #ffcc80, 0 0 5px #ffcc80, 0 0 10px #ffcc80;
-}
-
-#login_btn:hover {
-    background-color: #ffaa5c;
-    box-shadow: 0 0 5px #ffaa5c, 0 0 5px #ffaa5c, 0 0 10px #ffaa5c;
-}
-
-#username,
-#password {
-    padding: 12px;
-    margin: 8px 0;
-    color: #eee;
-    width: 100%;
-    background-color: #333;
-    border: none;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-#title {
-    color: white;
-}
+getMessages();
+setInterval(getMessages, 3000);
