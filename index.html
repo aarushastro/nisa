@@ -3,29 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Chat</title>
+    <title>NISAZ</title>
     <style>
-        body {
-            background-color: #333;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        #chat-box {
-            height: 400px;
-            overflow-y: scroll;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            padding: 10px;
-        }
-        #message-input {
-            width: 100%;
-            padding: 10px;
-        }
+        
     </style>
 </head>
 <body>
+    <div>
+        <button id="login_btn">Login</button>
+    </div>
+    
+    
     <div id="chat-box"></div>
     <input type="text" id="username" placeholder="Your username">
     <input type="text" id="message-input" placeholder="Type your message">
@@ -82,5 +70,7 @@
         // Fetch messages every 3 seconds (for demonstration purposes)
         setInterval(getMessages, 3000);
     </script>
+
+    
 </body>
 </html>
