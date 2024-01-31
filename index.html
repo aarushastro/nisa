@@ -7,17 +7,34 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="login_form">
-        <center>
-        <h1>Login</h1>
-        <h4>Login to your account!</h4>
+    <div id="login-form">
+        <h1>Welcome to SUBDIVISION</h1>
+        <h4>Login to your account</h5>
+        <input type="text" id="username" placeholder="Enter your username">
         <br>
-        <input id="password" type="password">PASSWORD</input>
-        <input id="username" type="text">USERNAME</input>
+        <input type="password" id="password" placeholder="Enter your password">
         <br>
-        <button id="login_btn">Login</button>
-        </center>
+        <br>
+        <button id="login_btn" onclick="checkPassword()">Login</button>
+        <div id="login-message"></div>
     </div>
+
+    <script>
+        function checkPassword() {
+            const enteredUsername = document.getElementById('username').value;
+            const enteredPassword = document.getElementById('password').value;
+
+    // Check if the entered username is 'aruz' and password is 'success'
+        if (enteredUsername.toLowerCase() === 'aruz' && enteredPassword === 'success') {
+            document.getElementById('login-message').innerHTML = 'Login successful!';
+            document.getElementById('login-message').style.color = 'green';
+        } else {
+            document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
+            document.getElementById('login-message').style.color = 'red';
+    }
+}
+
+    </script>
     
     
     <div id="chat-box"></div>
