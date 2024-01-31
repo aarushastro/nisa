@@ -26,13 +26,13 @@ body {
 
 input {
     padding: 12px;
-    margin: 8px 0; /* Adjusted margin for better spacing */
+    margin: 8px 0;
     color: #333;
-    width: 100%; /* Make input fields fill the container width */
-    background-color: #444; /* Darker background color */
+    width: 100%;
+    background-color: #444;
     border: none;
     border-radius: 5px;
-    box-sizing: border-box; /* Include padding and border in the total width/height */
+    box-sizing: border-box;
 }
 
 #login_btn {
@@ -55,13 +55,13 @@ input {
 #username,
 #password {
     padding: 12px;
-    margin: 8px 0; /* Adjusted margin for better spacing */
-    color: #eee; /* Light text color */
-    width: 100%; /* Make input fields fill the container width */
-    background-color: #333; /* Dark background color */
+    margin: 8px 0;
+    color: #eee;
+    width: 100%;
+    background-color: #333;
     border: none;
     border-radius: 5px;
-    box-sizing: border-box; /* Include padding and border in the total width/height */
+    box-sizing: border-box;
 }
 
 #title {
