@@ -9,7 +9,7 @@
 <body>
     <div id="login-form">
         <h1>Welcome to SUBDIVISION</h1>
-        <h4>Login to your account</h5>
+        <h4>Login to your account</h4>
         <input type="text" id="username" placeholder="Enter your username">
         <br>
         <input type="password" id="password" placeholder="Enter your password">
@@ -19,80 +19,10 @@
         <div id="login-message"></div>
     </div>
 
-    <script>
-        function checkPassword() {
-            const enteredUsername = document.getElementById('username').value;
-            const enteredPassword = document.getElementById('password').value;
-
-    // Check if the entered username is 'aruz' and password is 'success'
-        if (enteredUsername.toLowerCase() === 'aruz' && enteredPassword === 'success') {
-            document.getElementById('login-message').innerHTML = 'Login successful!';
-            document.getElementById('login-message').style.color = 'green';
-        } else {
-            document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
-            document.getElementById('login-message').style.color = 'red';
-    }
-}
-
-    </script>
-    
-    
     <div id="chat-box"></div>
     <input type="text" id="message-input" placeholder="Type your message">
     <button onclick="sendMessage()">Send</button>
 
-    <script>
-        function sendMessage() {
-            const username = document.getElementById('username').value;
-            const message = document.getElementById('message-input').value;
-
-            if (username && message) {
-                fetch('http://localhost:3000/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        message: message
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    document.getElementById('message-input').value = '';
-                    getMessages();
-                });
-            } else {
-                alert('Please enter both username and message.');
-            }
-        }
-
-        function getMessages() {
-            fetch('http://localhost:3000/messages')
-            .then(response => response.json())
-            .then(data => {
-                const chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML = '';
-
-                data.messages.forEach(msg => {
-                    const messageElement = document.createElement('div');
-                    messageElement.textContent = ${msg.username}: ${msg.message}`;
-                    chatBox.appendChild(messageElement);
-                });
-
-                // Scroll to the bottom
-                chatBox.scrollTop = chatBox.scrollHeight;
-            });
-        }
-
-        // Fetch messages initially
-        getMessages();
-
-        // Fetch messages every 3 seconds (for demonstration purposes)
-        setInterval(getMessages, 3000);
-    </script>
-
-    
+    <script src="app.js"></script>
 </body>
 </html>
