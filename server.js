@@ -1,41 +1,69 @@
-const express = require('express');
-const cors = require('cors');
+body {
+    font-family: monospace;
+    letter-spacing: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #1c1c1c;
+}
 
-const app = express();
-const port = 21982;
+#login-form {
+    color: white;
+    text-align: center;
+    background: rgb(0, 0, 0);
+    background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 35%, rgba(39, 39, 39, 1) 100%);
+    margin: inherit;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-app.use(cors());
-app.use(express.json());
+#login-message {
+    margin: 20px;
+}
 
-let messages = [];
+input {
+    padding: 12px;
+    margin: 8px 0;
+    color: #333;
+    width: 100%;
+    background-color: #444;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+#login_btn {
+    background-color: #ffcc80;
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: white;
+    box-shadow: 0 0 5px #ffcc80, 0 0 5px #ffcc80, 0 0 10px #ffcc80;
+}
 
-// In server.js
-app.route('/messages')
-  .get((req, res) => {
-    console.log('GET /messages');
-    res.json({ messages });
-  })
-.post((req, res) => {
-    console.log('POST /messages', req.body);
-    const { username, message } = req.body;
-    messages.push({ username, message });
-    res.json({ status: 'Message sent successfully' });
-  });
+#login_btn:hover {
+    background-color: #ffaa5c;
+    box-shadow: 0 0 5px #ffaa5c, 0 0 5px #ffaa5c, 0 0 10px #ffaa5c;
+}
 
-app.route('/messages')
-  .get((req, res) => {
-    res.json({ messages });
-  })
-  .post((req, res) => {
-    const { username, message } = req.body;
-    messages.push({ username, message });
-    res.json({ status: 'Message sent successfully' });
-  });
+#username,
+#password {
+    padding: 12px;
+    margin: 8px 0;
+    color: #eee;
+    width: 100%;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+#title {
+    color: white;
+}
