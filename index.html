@@ -7,28 +7,24 @@
     <title>Login Form</title>
 </head>
 <body>
-    <!-- Login Form -->
-    <div id="login-form" class="popup">
+    <div id="login-form" class="form-container">
         <h1>Welcome to SUBDIVISION</h1>
         <h4>Login to your account</h4>
         <input type="text" id="login-username" placeholder="Enter your username">
         <br>
         <input type="password" id="login-password" placeholder="Enter your password">
         <br>
-        <button id="login_btn" onclick="checkPassword()">Login</button>
+        <button id="login_btn" onclick="checkLogin()">Login</button>
         <div id="login-message"></div>
     </div>
 
-    <!-- Signup Form -->
-    <div id="signup-form" class="popup">
-        <h1>Signup</h1>
-        <input type="text" id="signup-username" placeholder="Choose a username">
-        <br>
-        <input type="password" id="signup-password" placeholder="Choose a password">
-        <br>
-        <button id="signup_btn" onclick="signup()">Signup</button>
+    <div id="signup-form" class="form-container">
+        <h1>Sign Up for SUBDIVISION</h1>
+        <!-- Add signup form elements here -->
+        <button id="signup_btn" onclick="signup()">Sign Up</button>
+        <div id="signup-message"></div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
