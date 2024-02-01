@@ -255,22 +255,62 @@
             }
         };
 
-        const getMessages = () => {
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            const chatBox = document.getElementById('chat-messages');
+        const getMessages = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/messages');
+                const data = await response.json();
+                const messages = data.messages || [];
 
-            chatBox.innerHTML = '';
+                const chatBox = document.getElementById('chat-messages');
+                chatBox.innerHTML = '';
 
-            messages.forEach(msg => {
-                const messageElement = document.createElement('div');
-                messageElement.textContent = `${msg.username} (${msg.timestamp}): ${msg.message}`;
-                chatBox.appendChild(messageElement);
-            });
+                messages.forEach(msg => {
+                    const messageElement = document.createElement('div');
+                    messageElement.textContent = `${msg.username} (${msg.timestamp}): ${msg.message}`;
+                    chatBox.appendChild(messageElement);
+                });
 
-            // Scroll to the bottom
-            chatBox.scrollTop = chatBox.scrollHeight;
+                // Scroll to the bottom
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
         };
 
+        // Modify the sendMessage function
+        const sendMessage = async () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (currentUser) {
+                const username = currentUser.username;
+                const message = document.getElementById('chat-input').value;
+
+                if (username && message) {
+                    const timestamp = new Date().toLocaleTimeString();
+
+                    try {
+                        await fetch('http://localhost:3000/messages', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ username, message, timestamp }),
+                        });
+
+                        document.getElementById('chat-input').value = '';
+                        getMessages();
+                    } catch (error) {
+                        console.error('Error sending message:', error);
+                    }
+                } else {
+                    alert('Please enter a message.');
+                }
+            } else {
+                alert('You need to be logged in to send messages.');
+            }
+        };
+
+        // Initialize the app
         const init = () => {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
