@@ -1,60 +1,99 @@
-function checkPassword() {
-    const enteredUsername = document.getElementById('username').value;
-    const enteredPassword = document.getElementById('password').value;
+// Add these functions for signup and login
 
-    if (enteredUsername.toLowerCase() === 'aruz' && enteredPassword === 'success') {
-        document.getElementById('login-message').innerHTML = 'Login successful!';
-        document.getElementById('login-message').style.color = 'green';
-    } else {
-        document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
-        document.getElementById('login-message').style.color = 'red';
-    }
+function signup() {
+  const username = document.getElementById('signup-username').value;
+  const password = document.getElementById('signup-password').value;
+
+  fetch('http://localhost:3000/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, password })
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(data.status);
+  });
 }
+
+function login() {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+
+  fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, password })
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(data.status);
+    if (data.user) {
+      // Hide login screen and show chat screen
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('chat-screen').style.display = 'block';
+
+      // Set the current user for sending messages
+      currentUsername = data.user.username;
+    }
+  });
+}
+
+// Modify sendMessage function to include the current user
+
+let currentUsername;
 
 function sendMessage() {
-    const username = document.getElementById('username').value;
-    const message = document.getElementById('message-input').value;
+  const message = document.getElementById('message-input').value;
 
-    if (username && message) {
-        fetch('http://localhost:3000/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                message: message
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            document.getElementById('message-input').value = '';
-            getMessages();
-        });
-    } else {
-        alert('Please enter both username and message.');
-    }
-}
-
-function getMessages() {
-    fetch('http://localhost:3000/messages')
+  if (currentUsername && message) {
+    fetch('http://localhost:3000/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: currentUsername,
+        message: message
+      })
+    })
     .then(response => response.json())
     .then(data => {
-        const chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML = '';
-
-        data.messages.forEach(msg => {
-            const messageElement = document.createElement('div');
-            const formattedTimestamp = new Date(msg.timestamp).toLocaleString(); // Format timestamp for display
-            messageElement.textContent = `[${formattedTimestamp}] ${msg.username}: ${msg.message}`;
-            chatBox.appendChild(messageElement);
-        });
-
-        chatBox.scrollTop = chatBox.scrollHeight;
+      console.log(data);
+      document.getElementById('message-input').value = '';
+      getMessages();
     });
+  } else {
+    alert('Please enter a message.');
+  }
 }
 
-getMessages();
-setInterval(getMessages, 3000);
+// Modify getMessages function to display username in a separate element
 
+function getMessages() {
+  fetch('http://localhost:3000/messages')
+  .then(response => response.json())
+  .then(data => {
+    const chatBox = document.getElementById('chat-box');
+    const userElement = document.getElementById('current-user');
+    chatBox.innerHTML = '';
+
+    data.messages.forEach(msg => {
+      const messageElement = document.createElement('div');
+      const formattedTimestamp = new Date(msg.timestamp).toLocaleString();
+      messageElement.textContent = `[${formattedTimestamp}] ${msg.username}: ${msg.message}`;
+      chatBox.appendChild(messageElement);
+    });
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Display the current user
+    userElement.textContent = `Current User: ${currentUsername}`;
+  });
+}
+
+// Hide chat screen initially
+document.getElementById('chat-screen').style.display = 'none';
