@@ -15,7 +15,9 @@
             background-color: #1c1c1c;
         }
 
-        #login-form {
+        #login-form,
+        #signup-form,
+        #chat-page {
             color: white;
             text-align: center;
             background: rgb(0, 0, 0);
@@ -24,14 +26,48 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        #signup-form {
             display: none;
         }
 
         #login-message {
             margin: 20px;
+        }
+
+        #chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        #chat-input {
+            padding: 12px;
+            margin: 8px 0;
+            color: #333;
+            width: 80%;
+            background-color: #444;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #send-btn {
+            background-color: #ffcc80;
+            width: 18%;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: white;
+            box-shadow: 0 0 5px #ffcc80, 0 0 5px #ffcc80, 0 0 10px #ffcc80;
+        }
+
+        #send-btn:hover {
+            background-color: #ffaa5c;
+            box-shadow: 0 0 5px #ffaa5c, 0 0 5px #ffaa5c, 0 0 10px #ffaa5c;
         }
 
         input {
@@ -82,12 +118,12 @@
             color: white;
         }
     </style>
-    <title>Login Form</title>
+    <title>ChatApp</title>
 </head>
 <body>
 
     <div id="login-form">
-        <h1>Welcome to SubDivision</h1>
+        <h1>Welcome to ChatApp</h1>
         <input type="text" id="login-username" placeholder="Enter your username">
         <br>
         <input type="password" id="login-password" placeholder="Enter your password">
@@ -107,48 +143,37 @@
         <button id="signup_btn" onclick="signup()">Sign Up</button>
         <br>
         <p>Already have an account? <a href="#" onclick="showLoginForm()">Login</a></p>
+        <div id="signup-message"></div>
+    </div>
+
+    <div id="chat-page">
+        <h1>Welcome to the Chat Room</h1>
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="Type your message">
+        <button id="send-btn" onclick="sendMessage()">Send</button>
+        <br>
+        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
-        function showSignupForm() {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('signup-form').style.display = 'block';
-        }
-
-        function showLoginForm() {
-            document.getElementById('signup-form').style.display = 'none';
+        const showLoginForm = () => {
             document.getElementById('login-form').style.display = 'block';
-        }
+            document.getElementById('signup-form').style.display = 'none';
+        };
 
-        function signup() {
-            const username = document.getElementById('signup-username').value;
-            const password = document.getElementById('signup-password').value;
+        const showSignupForm = () => {
+            document.getElementById('signup-form').style.display = 'block';
+            document.getElementById('login-form').style.display = 'none';
+        };
 
-            if (username && password) {
-                // Get existing users or initialize an empty array
-                const users = JSON.parse(localStorage.getItem('users')) || [];
+        const showChatPage = () => {
+            document.getElementById('chat-page').style.display = 'block';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'none';
+            getMessages();
+        };
 
-                // Check if the username already exists
-                const userExists = users.some(user => user.username === username);
-
-                if (!userExists) {
-                    // Add the new user to the array
-                    users.push({ username, password });
-
-                    // Store the updated users array in localStorage
-                    localStorage.setItem('users', JSON.stringify(users));
-
-                    // Switch to login form
-                    showLoginForm();
-                } else {
-                    alert('Username already exists. Please choose a different username.');
-                }
-            } else {
-                alert('Please enter both username and password.');
-            }
-        }
-
-        function login() {
+        const login = () => {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
 
@@ -162,6 +187,8 @@
                 if (user) {
                     document.getElementById('login-message').innerHTML = 'Login successful!';
                     document.getElementById('login-message').style.color = 'green';
+                    showChatPage();
+                    localStorage.setItem('currentUser', JSON.stringify(user));
                 } else {
                     document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
                     document.getElementById('login-message').style.color = 'red';
@@ -169,7 +196,92 @@
             } else {
                 alert('Please enter both username and password.');
             }
-        }
+        };
+
+        const signup = () => {
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (username && password) {
+                // Get existing users or initialize an empty array
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+
+                // Check if the username is already taken
+                const isUsernameTaken = users.some(u => u.username === username);
+
+                if (!isUsernameTaken) {
+                    // Add the new user
+                    users.push({ username, password });
+                    localStorage.setItem('users', JSON.stringify(users));
+                    document.getElementById('signup-message').innerHTML = 'Sign up successful!';
+                    document.getElementById('signup-message').style.color = 'green';
+                    showLoginForm();
+                } else {
+                    document.getElementById('signup-message').innerHTML = 'Username is already taken. Choose another.';
+                    document.getElementById('signup-message').style.color = 'red';
+                }
+            } else {
+                alert('Please enter both username and password.');
+            }
+        };
+
+        const logout = () => {
+            localStorage.removeItem('currentUser');
+            showLoginForm();
+        };
+
+        const sendMessage = () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (currentUser) {
+                const username = currentUser.username;
+                const message = document.getElementById('chat-input').value;
+
+                if (username && message) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    const messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+                    messages.push({ username, message, timestamp });
+                    localStorage.setItem('messages', JSON.stringify(messages));
+
+                    document.getElementById('chat-input').value = '';
+                    getMessages();
+                } else {
+                    alert('Please enter a message.');
+                }
+            } else {
+                alert('You need to be logged in to send messages.');
+            }
+        };
+
+        const getMessages = () => {
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            const chatBox = document.getElementById('chat-messages');
+
+            chatBox.innerHTML = '';
+
+            messages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = `${msg.username} (${msg.timestamp}): ${msg.message}`;
+                chatBox.appendChild(messageElement);
+            });
+
+            // Scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        const init = () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (currentUser) {
+                showChatPage();
+            } else {
+                showLoginForm();
+            }
+        };
+
+        // Initialize the app
+        init();
     </script>
 
 </body>
