@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const app = express();
 const port = 3000;
 
-// Replace the following path with the actual path to your serviceAccountKey.json file
+// Replace the following object with your actual serviceAccount credentials
 const serviceAccount = {
   "type": "service_account",
   "project_id": "subdivision-45cdf",
@@ -47,9 +47,14 @@ app.get('/messages', async (req, res) => {
 app.post('/messages', async (req, res) => {
   try {
     const { username, message, timestamp } = req.body;
-    const messagesRef = db.collection('messages');
-    await messagesRef.add({ username, message, timestamp });
-    res.json({ status: 'Message sent successfully' });
+
+    if (username && message && timestamp) {
+      const messagesRef = db.collection('messages');
+      await messagesRef.add({ username, message, timestamp });
+      res.json({ status: 'Message sent successfully' });
+    } else {
+      res.status(400).json({ error: 'Invalid request body' });
+    }
   } catch (error) {
     console.error('Error storing message in Firestore:', error);
     res.status(500).json({ error: 'Internal Server Error' });
