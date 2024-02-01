@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const app = express();
 const port = 3000;
 
-// Replace the following object with your actual serviceAccount credentials
+
 const serviceAccount = {
   "type": "service_account",
   "project_id": "subdivision-45cdf",
@@ -30,7 +30,6 @@ const db = admin.firestore();
 app.use(cors());
 app.use(express.json());
 
-// Handle GET request to retrieve messages
 app.get('/messages', async (req, res) => {
   try {
     const messagesRef = db.collection('messages');
