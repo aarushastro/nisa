@@ -9,12 +9,7 @@ body {
     background-color: #1c1c1c;
 }
 
-.popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.form-container {
     color: white;
     text-align: center;
     background: rgb(0, 0, 0);
@@ -25,8 +20,18 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#login_btn,
-#signup_btn {
+.input-field {
+    padding: 12px;
+    margin: 8px 0;
+    color: #eee;
+    width: 100%;
+    background-color: #333;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.button {
     background-color: #ffcc80;
     width: 100%;
     height: 40px;
@@ -38,23 +43,7 @@ body {
     box-shadow: 0 0 5px #ffcc80, 0 0 5px #ffcc80, 0 0 10px #ffcc80;
 }
 
-#login_btn:hover,
-#signup_btn:hover {
+.button:hover {
     background-color: #ffaa5c;
     box-shadow: 0 0 5px #ffaa5c, 0 0 5px #ffaa5c, 0 0 10px #ffaa5c;
-}
-
-input {
-    padding: 12px;
-    margin: 8px 0;
-    color: #333;
-    width: 100%;
-    background-color: #444;
-    border: none;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-#login-message {
-    margin: 20px;
 }
