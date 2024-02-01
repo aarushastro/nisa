@@ -1,55 +1,20 @@
-const express = require('express');
-const cors = require('cors');
+function checkLogin() {
+    const enteredUsername = document.getElementById('login-username').value;
+    const enteredPassword = document.getElementById('login-password').value;
 
-const app = express();
-const port = 3000;
-
-app.use(cors());
-app.use(express.json());
-
-let users = [];
-let messages = [];
-
-app.route('/signup')
-  .post((req, res) => {
-    const { username, password } = req.body;
-
-    // Check if the username is already taken
-    if (users.find(user => user.username === username)) {
-      res.json({ status: 'Username already taken' });
+    // Check if the entered username is 'aruz' and password is 'success'
+    if (enteredUsername.toLowerCase() === 'aruz' && enteredPassword === 'success') {
+        document.getElementById('login-message').innerHTML = 'Login successful!';
+        document.getElementById('login-message').style.color = 'green';
     } else {
-      // Add the user to the users array
-      users.push({ username, password });
-      res.json({ status: 'User created successfully' });
+        document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
+        document.getElementById('login-message').style.color = 'red';
     }
-  });
+}
 
-app.route('/login')
-  .post((req, res) => {
-    const { username, password } = req.body;
-
-    // Check if the username and password match
-    const user = users.find(user => user.username === username && user.password === password);
-    if (user) {
-      res.json({ status: 'Login successful', user: { username } });
-    } else {
-      res.json({ status: 'Invalid username or password' });
-    }
-  });
-
-app.route('/messages')
-  .get((req, res) => {
-    console.log('GET /messages');
-    res.json({ messages });
-  })
-  .post((req, res) => {
-    console.log('POST /messages', req.body);
-    const { username, message } = req.body;
-    const timestamp = new Date().toISOString();
-    messages.push({ username, message, timestamp });
-    res.json({ status: 'Message sent successfully' });
-  });
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+// Function for signup (you can implement this as needed)
+function signup() {
+    // Placeholder for signup functionality
+    document.getElementById('signup-message').innerHTML = 'Signup functionality coming soon!';
+    document.getElementById('signup-message').style.color = 'white';
+}
