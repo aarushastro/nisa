@@ -3,28 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: monospace;
+            letter-spacing: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1c1c1c;
+        }
+
+        #login-form {
+            color: white;
+            text-align: center;
+            background: rgb(0, 0, 0);
+            background: linear-gradient(0deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 35%, rgba(39, 39, 39, 1) 100%);
+            margin: inherit;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #signup-form {
+            display: none;
+        }
+
+        #login-message {
+            margin: 20px;
+        }
+
+        input {
+            padding: 12px;
+            margin: 8px 0;
+            color: #333;
+            width: 100%;
+            background-color: #444;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #login_btn,
+        #signup_btn {
+            background-color: #ffcc80;
+            width: 100%;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: white;
+            box-shadow: 0 0 5px #ffcc80, 0 0 5px #ffcc80, 0 0 10px #ffcc80;
+        }
+
+        #login_btn:hover,
+        #signup_btn:hover {
+            background-color: #ffaa5c;
+            box-shadow: 0 0 5px #ffaa5c, 0 0 5px #ffaa5c, 0 0 10px #ffaa5c;
+        }
+
+        #username,
+        #password,
+        #signup-username,
+        #signup-password {
+            padding: 12px;
+            margin: 8px 0;
+            color: #eee;
+            width: 100%;
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #title {
+            color: white;
+        }
+    </style>
     <title>Login Form</title>
 </head>
 <body>
-    <div id="login-form" class="form-container">
-        <h1>Welcome to SUBDIVISION</h1>
-        <h4>Login to your account</h4>
+
+    <div id="login-form">
+        <h1>Welcome to SubDivision</h1>
         <input type="text" id="login-username" placeholder="Enter your username">
         <br>
         <input type="password" id="login-password" placeholder="Enter your password">
         <br>
-        <button id="login_btn" onclick="checkLogin()">Login</button>
+        <button id="login_btn" onclick="login()">Login</button>
+        <br>
+        <p>Don't have an account? <a href="#" onclick="showSignupForm()">Sign Up</a></p>
         <div id="login-message"></div>
     </div>
 
-    <div id="signup-form" class="form-container">
-        <h1>Sign Up for SUBDIVISION</h1>
-        <!-- Add signup form elements here -->
+    <div id="signup-form">
+        <h1>Sign Up</h1>
+        <input type="text" id="signup-username" placeholder="Choose a username">
+        <br>
+        <input type="password" id="signup-password" placeholder="Choose a password">
+        <br>
         <button id="signup_btn" onclick="signup()">Sign Up</button>
-        <div id="signup-message"></div>
+        <br>
+        <p>Already have an account? <a href="#" onclick="showLoginForm()">Login</a></p>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        function showSignupForm() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'block';
+        }
+
+        function showLoginForm() {
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        }
+
+        function signup() {
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (username && password) {
+                // Get existing users or initialize an empty array
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+
+                // Check if the username already exists
+                const userExists = users.some(user => user.username === username);
+
+                if (!userExists) {
+                    // Add the new user to the array
+                    users.push({ username, password });
+
+                    // Store the updated users array in localStorage
+                    localStorage.setItem('users', JSON.stringify(users));
+
+                    // Switch to login form
+                    showLoginForm();
+                } else {
+                    alert('Username already exists. Please choose a different username.');
+                }
+            } else {
+                alert('Please enter both username and password.');
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            if (username && password) {
+                // Get existing users or initialize an empty array
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+
+                // Check if the provided username and password match any stored user
+                const user = users.find(u => u.username === username && u.password === password);
+
+                if (user) {
+                    document.getElementById('login-message').innerHTML = 'Login successful!';
+                    document.getElementById('login-message').style.color = 'green';
+                } else {
+                    document.getElementById('login-message').innerHTML = 'Login failed. Please try again.';
+                    document.getElementById('login-message').style.color = 'red';
+                }
+            } else {
+                alert('Please enter both username and password.');
+            }
+        }
+    </script>
+
 </body>
 </html>
