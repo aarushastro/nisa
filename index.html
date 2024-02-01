@@ -1,42 +1,32 @@
-<!-- Add the following HTML structure -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NISAZ</title>
     <link rel="stylesheet" href="styles.css">
+    <title>Login Form</title>
 </head>
 <body>
-    <!-- Signup Screen -->
-    <div id="signup-screen">
-        <h1>Signup</h1>
-        <input type="text" id="signup-username" placeholder="Enter your username">
-        <br>
-        <input type="password" id="signup-password" placeholder="Enter your password">
-        <br>
-        <button onclick="signup()">Signup</button>
-    </div>
-
-    <!-- Login Screen -->
-    <div id="login-screen">
-        <h1>Login</h1>
+    <!-- Login Form -->
+    <div id="login-form" class="popup">
+        <h1>Welcome to SUBDIVISION</h1>
+        <h4>Login to your account</h4>
         <input type="text" id="login-username" placeholder="Enter your username">
         <br>
         <input type="password" id="login-password" placeholder="Enter your password">
         <br>
-        <button onclick="login()">Login</button>
+        <button id="login_btn" onclick="checkPassword()">Login</button>
+        <div id="login-message"></div>
     </div>
 
-    <!-- Chat Screen -->
-    <div id="chat-screen">
-        <h1>Welcome to SUBDIVISION</h1>
-        <h4 id="current-user"></h4>
-        <div id="chat-box"></div>
-        <input type="text" id="message-input" placeholder="Type your message">
-        <button onclick="sendMessage()">Send</button>
-        <div id="login-message"></div>
+    <!-- Signup Form -->
+    <div id="signup-form" class="popup">
+        <h1>Signup</h1>
+        <input type="text" id="signup-username" placeholder="Choose a username">
+        <br>
+        <input type="password" id="signup-password" placeholder="Choose a password">
+        <br>
+        <button id="signup_btn" onclick="signup()">Signup</button>
     </div>
 
     <script src="app.js"></script>
