@@ -5,6 +5,28 @@ const cors = require('cors');
 const app = express();
 const port = 3000;
 
+const serverUrl = 'https://nisaz.netlify.app/';
+
+// Fetch messages
+fetch(`${serverUrl}/messages`)
+    .then(response => response.json())
+    .then(data => {
+        // Process messages
+    });
+
+// Send messages
+fetch(`${serverUrl}/messages`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        username: username,
+        message: message
+    })
+});
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -26,6 +48,7 @@ db.connect(err => {
 });
 
 // Handle GET request to retrieve messages
+
 app.get('/messages', (req, res) => {
     const sql = 'SELECT * FROM messages';
 
