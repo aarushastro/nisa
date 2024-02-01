@@ -1,3 +1,5 @@
+<!-- Add the following HTML structure -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,23 +9,36 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="login-form">
+    <!-- Signup Screen -->
+    <div id="signup-screen">
+        <h1>Signup</h1>
+        <input type="text" id="signup-username" placeholder="Enter your username">
+        <br>
+        <input type="password" id="signup-password" placeholder="Enter your password">
+        <br>
+        <button onclick="signup()">Signup</button>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <h1>Login</h1>
+        <input type="text" id="login-username" placeholder="Enter your username">
+        <br>
+        <input type="password" id="login-password" placeholder="Enter your password">
+        <br>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chat-screen">
         <h1>Welcome to SUBDIVISION</h1>
-        <h4>Login to your account</h4>
-        <input type="text" id="username" placeholder="Enter your username">
-        <br>
-        <input type="password" id="password" placeholder="Enter your password">
-        <br>
-        <br>
-        <button id="login_btn" onclick="checkPassword()">Login</button>
+        <h4 id="current-user"></h4>
+        <div id="chat-box"></div>
+        <input type="text" id="message-input" placeholder="Type your message">
+        <button onclick="sendMessage()">Send</button>
         <div id="login-message"></div>
     </div>
 
-    <div id="chat-box"></div>
-    <input type="text" id="message-input" placeholder="Type your message">
-    <button onclick="sendMessage()">Send</button>
-
-    <script src="server.js"></script>
-    <scipt src="app.js"></scipt>
+    <script src="app.js"></script>
 </body>
 </html>
